@@ -10,6 +10,7 @@ const Content = ({parts}) => {
   return(
     <>
       {parts.map(c => <p key={c.id}>{c.name} {c.exercises}</p>)}
+      <p><b>total of {parts.reduce((accumulator, currentValue) => accumulator + currentValue.exercises, 0)} exercises</b></p>
     </>
   )
 }
