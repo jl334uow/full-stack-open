@@ -3,13 +3,20 @@ import { useState } from 'react'
 const App = () => {
   const [persons, setPersons] = useState([{name: 'Arto Hellas'}])
   const [newName, setNewName] = useState('')
+
   const addName = (event) => {
     event.preventDefault()
+    if (persons.some(person => person.name === newName)) {
+      alert(newName + ' is already added to the phonebook')
+    }
+    else{
     console.log('Name added', event.target, newName)
     const personsCopy = [...persons]
     personsCopy.push({name: newName})
     setPersons(personsCopy)
-    setNewName('')
+    setNewName('')      
+    }
+
   }
 
   const handleNameChange = (event) => {
