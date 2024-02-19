@@ -1,9 +1,16 @@
 import { useState } from 'react'
 
+const Contact = ({person}) => {
+  return(
+    <>{person.name} {person.number}<br/></>
+  )
+}
 const App = () => {
   const [persons, setPersons] = useState([{name: 'Arto Hellas', number: '123 456 789'}])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [showAll, setShowAll] = useState(true)
+  const [filteredName, setFilteredName] = useState('')
 
   const addName = (event) => {
     event.preventDefault()
@@ -11,28 +18,37 @@ const App = () => {
       alert('${newName} is already added to the phonebook')
     }
     else{
-    console.log('Name added', event.target, newName)
     const personsCopy = [...persons]
     personsCopy.push({name: newName, number: newNumber})
     setPersons(personsCopy)
-    setNewName('')      
-    }
 
+    setNewName('')
+    setNewNumber('')
+    }
   }
 
   const handleNameChange = (event) => {
-    console.log(event.target.value)
     setNewName(event.target.value)
   }
 
   const handleNumberChange = (event) => {
-    console.log(event.target.value)
     setNewNumber(event.target.value)
   }
+  
+  const namesToShow = showAll ? persons : persons.filter(person => person.name.toLowerCase().includes(filteredName.toLowerCase()))
+
+  const handleFilteredNameChange = (event) => {
+    setFilteredName(event.target.value)
+    setShowAll(!showAll)
+  }
+
 
   return(
     <div>
       <h2>Phonebook</h2>
+      <input value={filteredName} onChange={handleFilteredNameChange}/>
+
+      <h2>add a new</h2>
       <form onSubmit={addName}>
         <div>
           name: <input value={newName} onChange={handleNameChange}/>
@@ -43,7 +59,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      {persons.map(person => <>{person.name} {person.number}<br/></>)}
+      {namesToShow.map(person => <Contact key={person.name} person={person}/>)}
     </div>
   )
 }
