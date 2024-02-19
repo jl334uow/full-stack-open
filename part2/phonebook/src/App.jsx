@@ -26,12 +26,18 @@ const App = () => {
       alert('${newName} is already added to the phonebook')
     }
     else{
-    const personsCopy = [...persons]
-    personsCopy.push({name: newName, number: newNumber})
-    setPersons(personsCopy)
+      const personObject = {
+        name: newName,
+        number: newNumber
+      }
+      axios.post('http://localhost:3001/persons', personObject).then(response =>{
+        const personsCopy = [...persons]
+        personsCopy.push(response.data)
+        setPersons(personsCopy)
+      })
 
-    setNewName('')
-    setNewNumber('')
+      setNewName('')
+      setNewNumber('')
     }
   }
 
