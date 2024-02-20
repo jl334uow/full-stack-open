@@ -22,8 +22,16 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault()
-    if (persons.some(person => person.name === newName)) {
-      alert('${newName} is already added to the phonebook')
+    var personCopy = {}
+    if (persons.some(person => person.name === newName ? personCopy = person : false)) {
+      console.log(personCopy)
+      if(window.confirm('${newName} is already added to the phonebook, replace the old number with a new one?')) {
+        personService.update(personCopy.id, {name: personCopy.name, number:newNumber, id: personCopy.id})
+          .then(window.location.reload())
+      }
+      else {
+        event.preventDefault()
+      }
     }
     else{
       const personObject = {
