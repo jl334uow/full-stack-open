@@ -72,7 +72,16 @@ app.post('/api/persons', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    person = persons.filter(person => person.id !== id)
+    const personToDelete = persons.filter(person => person.id === id)
+
+    if(!personToDelete) {
+        return response.status(404).json({error: 'No person object with ID' + id + ' is found'})
+    }
+
+    const index = persons.indexOf(personToDelete)
+
+    persons.splice(index, 1)
+
     response.status(204).end()
     
 })
