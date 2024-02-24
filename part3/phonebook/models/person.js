@@ -17,10 +17,26 @@ mongoose.connect(url)
     console.log('error connecting to MongoDB:', error.message)
   })
 
+const validator = (val) => {
+    const regex = /([0-9]{2,3})-[0-9]+/
+    return regex.test(val)
+}
+
 const personSchema = new mongoose.Schema({
-name: String,
-number: String,
+    name: {
+        type: String,
+        minLength: 3,
+        required: true
+    },
+    number: {
+        type: String,
+        minLength: 1,
+        required: true,
+        validate: validator
+
+    },
 })
+
 
 personSchema.set('toJSON', {
     transform: (document, returnedObject) => {

@@ -32,7 +32,7 @@ app.get('/info', (request, response) => {
     Person.countDocuments().then((doc_count) => response.send('<p>Phonebook has info for ' + doc_count + ' people</p>' + d.toUTCString()))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const personRequest = request.body
     if (!personRequest.name || !personRequest.number) {
         return response.status(400).json({error: 'content missing'})
@@ -41,7 +41,10 @@ app.post('/api/persons', (request, response) => {
         name: personRequest.name,
         number: personRequest.number
     })
-    person.save().then(savedPerson => response.json(savedPerson))
+    person.save()
+        .then(savedPerson => {response.json(savedPerson)})
+        .catch(error => {
+            next(error)})
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -50,7 +53,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         name: personRequest.name,
         number: personRequest.number
     }
-    Person.findByIdAndUpdate(request.params.id, person, {new:true}).then(person => {response.json(person)}).catch(error => next(error))
+    Person.findByIdAndUpdate(request.params.id, person, {runValidators: true} , {new:true}).then(person => {response.json(person)}).catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -61,6 +64,18 @@ app.delete('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
     
 })
+
+const errorHandler = (error, request, response, next) => {
+    if (error.name === 'ValidationError') {
+        console.log(JSON.stringify(error.message, Object.getOwnPropertyNames(error)))
+        return response.status(500).send({message: JSON.stringify(error.message, Object.getOwnPropertyNames(error))})
+    }
+  
+    next(error)
+  }
+  
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
