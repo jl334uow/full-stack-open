@@ -27,7 +27,6 @@ test('blogs are returned as json', async () => {
 describe('check id', () => {
   test('check _id and id is the same', async () => {
     const response = await api.get('/api/blogs')
-    console.log("BOBS YA UNCLE" + JSON.stringify(response.body))
     response.body.map(e => assert(e._id === e.id))
   })
 })
@@ -49,7 +48,25 @@ describe('check that blogs are posted to api/blogs url correctly', () => {
       const contents = JSON.stringify(response.body)
       assert.strictEqual(response.body.length, initialLength + 1)
   })
-    after(async () => {
-      await mongoose.connection.close()
-    })
+})
+
+test('check likes property default is 0', async () => {
+  const newBlogPost =   {
+    "title": "Dr",
+    "author": "ooga",
+    "url": "oogabooga"
+  }
+
+  const request = await api.post('/api/blogs').send(newBlogPost).expect(201)
+  assert(newBlogPost.hasOwnProperty("likes") === false)
+  assert(request.body.likes === 0)
+
+  const response = await api.get('/api/blogs')
+  const addedBlog = response.body[response.body.length - 1]
+  assert(addedBlog.url === newBlogPost.url, addedBlog.url + " not equal to " + newBlogPost.url)
+
+  assert(addedBlog.likes ===  0, addedBlog.likes + " not equal to expected value of " + 0)
+})
+after(async () => {
+  await mongoose.connection.close()
 })
