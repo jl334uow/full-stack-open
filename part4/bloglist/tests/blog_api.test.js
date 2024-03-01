@@ -88,6 +88,23 @@ test('delete a blog post', async () => {
   const contents = blogsAtEnd.map(r => r.content)
   assert(blogsAtStart !== blogsAtEnd)
 })
+
+test('update a blog post', async () => {
+  const blogAtStart = await helper.blogsInDb()
+  const blogToUpdate = {
+    "_id" : blogAtStart[0]._id,
+    "title" : "yeh",
+    "author" : "nah",
+    "url" : "true hey"
+  }
+  await api.put(`/api/blogs/${blogToUpdate._id}`).send(blogToUpdate)
+  const blogAtEnd = await helper.blogsInDb()
+
+  assert(blogAtStart[0]._id === blogAtEnd[0]._id)
+  assert(blogAtStart[0].title !== blogAtEnd[0].title)
+  assert(blogAtStart[0].author !== blogAtEnd[0].author)
+  assert(blogAtStart[0].url !== blogAtEnd[0].url)
+})
 after(async () => {
   await mongoose.connection.close()
 })
