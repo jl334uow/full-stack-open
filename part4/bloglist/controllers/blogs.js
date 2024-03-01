@@ -15,15 +15,20 @@ blogsRouter.get('/api/blogs', (request, response) => {
 })
 
 blogsRouter.post('/api/blogs', (request, response) => {
-  const body = request.body
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0
-  })
-
-  blog.save().then(result => {response.status(201).json(result)})
+    const body = request.body
+    if (body.title && body.author && body.url){
+      const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes || 0
+      })
+  
+      blog.save().then(result => {response.status(201).json(result)}).catch(error => next(error))
+    }
+    else {
+      blog.abort().then(() => response.status(400))
+    }
 })
 
 module.exports = blogsRouter

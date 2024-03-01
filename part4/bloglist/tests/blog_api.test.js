@@ -33,7 +33,7 @@ describe('check id', () => {
 
 describe('check that blogs are posted to api/blogs url correctly', () => {
   test('check blog post uploaded correctly', async () => {
-      const newBlogPost =   {
+      var newBlogPost =   {
         "title": "Mr",
         "author": "bill",
         "url": "xyz",
@@ -41,12 +41,21 @@ describe('check that blogs are posted to api/blogs url correctly', () => {
         "id": "65db20f0db5b0fe26ef321d0"
       }
 
-      const initialLength = initialBlogs.length
+      var initialLength = initialBlogs.length
 
       await api.post('/api/blogs').send(newBlogPost).expect(201)
-      const response = await api.get('/api/blogs')
-      const contents = JSON.stringify(response.body)
+      var response = await api.get('/api/blogs')
       assert.strictEqual(response.body.length, initialLength + 1)
+
+      initialLength = initialLength + 1
+      newBlogPost = {
+        "url": "ooo",
+        "likes": 1,        
+      }
+
+      const contents = await api.post('/api/blogs').send(newBlogPost)
+      response = await api.get('/api/blogs')
+      assert(response.body.length === initialLength)
   })
 })
 
