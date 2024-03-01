@@ -8,7 +8,7 @@ const api = supertest(app)
 const logger = require('../utils/logger')
 const Blog = require('../models/blog')
 const initialBlogs = require('./data')
-
+helper = require('./test_helper')
 beforeEach(async () => {
   await Blog.deleteMany({})
   const blogObjects = initialBlogs.map(blog => new Blog(blog))
@@ -75,6 +75,18 @@ test('check likes property default is 0', async () => {
   assert(addedBlog.url === newBlogPost.url, addedBlog.url + " not equal to " + newBlogPost.url)
 
   assert(addedBlog.likes ===  0, addedBlog.likes + " not equal to expected value of " + 0)
+})
+
+test('delete a blog post', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+  await api.delete(`/api/blogs/${blogToDelete._id}`).expect(204)
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
+
+  const contents = blogsAtEnd.map(r => r.content)
+  assert(blogsAtStart !== blogsAtEnd)
 })
 after(async () => {
   await mongoose.connection.close()
