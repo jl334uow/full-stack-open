@@ -1,6 +1,15 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
 
 blogsRouter.get('/', (request, response) => {
     Blog.find({}).then(blogs => {
@@ -15,20 +24,28 @@ blogsRouter.get('/api/blogs', (request, response) => {
     })
 })
 
-blogsRouter.post('/api/blogs', (request, response) => {
+blogsRouter.post('/api/blogs', async (request, response) => {
     const body = request.body
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+
     if (body.title && body.author && body.url){
       const blog = new Blog({
         title: body.title,
         author: body.author,
         url: body.url,
-        likes: body.likes || 0
+        likes: body.likes || 0,
+        user: user.id
       })
   
-      blog.save().then(result => {response.status(201).json(result)}).catch(error => next(error))
+      await blog.save().then(result => {response.status(201).json(result)}).catch(error => next(error))
+
     }
     else {
-      blog.abort().then(() => response.status(400))
+      return response.status(400).json({ error: `missing value(s) in request` })
     }
 })
 
