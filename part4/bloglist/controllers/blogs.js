@@ -38,9 +38,15 @@ blogsRouter.post('/api/blogs', async (request, response) => {
         author: body.author,
         url: body.url,
         likes: body.likes || 0,
-        user: user.id
+        user: {
+          username: user.username,
+          name: user.name,
+          id: user.id,
+        }
       })
-  
+
+      user.blogs = user.blogs.concat(blog)
+      await user.save()
       await blog.save().then(result => {response.status(201).json(result)}).catch(error => next(error))
 
     }
