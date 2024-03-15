@@ -54,7 +54,7 @@ const App = () => {
     </form>)
   }
   const blogForm = () => {
-    return (<form>
+    return (<form onSubmit={handleAddBlog}>
       <h2>Add blog</h2>
       <div>
         <div>
@@ -112,6 +112,25 @@ const App = () => {
     }
   }
 
+  const handleAddBlog = async (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title: title,
+      author: author,
+      url: url
+    }
+    console.log('Adding blog: ' + JSON.stringify(blogObject))
+    await blogService
+      .create(blogObject)
+      .then(response => {
+        const blogCopy = [...blogs]
+        blogCopy.push(response.data)
+        setBlogs(blogCopy)
+        setTitle('')
+        setAuthor('')
+        setUrl('')
+      })
+  }
   if (user === null) {
     return loginForm()
   }
@@ -123,6 +142,7 @@ const App = () => {
       }}>
         <p>{user.name} logged-in <button type="submit">logout</button></p>
       </form>
+      {blogForm()}
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
