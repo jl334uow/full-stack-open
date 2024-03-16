@@ -10,7 +10,8 @@ const App = () => {
 
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')  
+  const [url, setUrl] = useState('')
+  const [message, setMessage] = useState('')
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
@@ -19,15 +20,28 @@ const App = () => {
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
+    if (loggedUserJSON != "undefined") {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
     }
   },[])
+
+  const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+  
+    return (
+      <div className='message'>
+        {message}
+      </div>
+    )
+  }
   const loginForm = () => {
     return (<form onSubmit={handleLogin}>
       <h2>Login</h2>
+      <Notification message={message}/>
       <div>
         username
         <input
@@ -53,8 +67,10 @@ const App = () => {
       <button type="submit">login</button>
     </form>)
   }
+
   const blogForm = () => {
-    return (<form onSubmit={handleAddBlog}>
+    return (
+    <form onSubmit={handleAddBlog}>
       <h2>Add blog</h2>
       <div>
         <div>
@@ -91,6 +107,7 @@ const App = () => {
       <button type="submit">add blog</button>
     </form>)
   }
+
   const handleLogin = async (event) => {
     event.preventDefault()
     
@@ -103,11 +120,12 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+
     }
     catch (error) {
-      setErrorMessage('Incorrect credentials')
+      setMessage('wrong username or password')
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage(null)
       }, 5000)
     }
   }
@@ -129,14 +147,21 @@ const App = () => {
         setTitle('')
         setAuthor('')
         setUrl('')
+        setMessage('A new blog ' + blogObject.title + ' by ' + blogObject.author + ' has been added')
+      })
+      .catch(error => {
+        setMessage(String(error.response.data.message))
+        setTimeout(() => setMessage(null), 5000)
       })
   }
+
   if (user === null) {
     return loginForm()
   }
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={message}/>
       <form onSubmit={() => {
         window.localStorage.removeItem('loggedBlogappUser')
       }}>
