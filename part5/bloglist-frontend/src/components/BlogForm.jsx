@@ -1,31 +1,30 @@
 import { useState } from "react"
 import blogService from '../services/blogs'
 const BlogForm = ({setMessage, blogs, setBlogs}) => {
-    const [title, setTitle] = useState('')
-    const [author, setAuthor] = useState('')
-    const [url, setUrl] = useState('')
+    const [form, setForm] = useState({
+        title: '',
+        author: '',
+        url: '',
+    })
     const [addBlogVisible, setAddBlogVisible] = useState(false)
     const hideWhenVisible = { display: addBlogVisible ? 'none' : ''}
     const showWhenVisible = { display: addBlogVisible ? '' : 'none'}
     const handleAddBlog = async (event) => {
         event.preventDefault()
-        const blogObject = {
-          title: title,
-          author: author,
-          url: url
-        }
-        console.log('Adding blog: ' + JSON.stringify(blogObject))
-        blogs.map(blog => console.log(blog))
+
+        console.log('Adding blog: ' + JSON.stringify(form))
         await blogService
-          .create(blogObject)
+          .create(form)
           .then(response => {
             const blogCopy = [...blogs]
             blogCopy.push(response.data)
             setBlogs(blogCopy)
-            setTitle('')
-            setAuthor('')
-            setUrl('')
-            setMessage('A new blog ' + blogObject.title + ' by ' + blogObject.author + ' has been added')
+            setForm({
+                title: '',
+                author: '',
+                url: '',
+            })
+            setMessage('A new blog ' + form.title + ' by ' + form.author + ' has been added')
             setAddBlogVisible(false)
           })
           .catch(error => {
@@ -47,30 +46,30 @@ const BlogForm = ({setMessage, blogs, setBlogs}) => {
               title
               <input
                 type="text"
-                value={title}
+                value={form.title}
                 name="Title"
                 title="Title"
-                onChange={({ target }) => setTitle(target.value)}
+                onChange={({ target }) => setForm({...form, title: target.value})}
               />
             </div>
             <div>
               author
               <input 
                 type="text"
-                value={author}
+                value={form.author}
                 name="Author"
                 title="Author"
-                onChange={({ target }) => setAuthor(target.value)}
+                onChange={({ target }) => setForm({...form, author: target.value})}
               />
             </div>
             <div>
               url
               <input
                 type="text"
-                value={url}
+                value={form.url}
                 name="Url"
                 title="Url"
-                onChange={({ target }) => setUrl(target.value)}
+                onChange={({ target }) => setForm({...form, url: target.value})}
               />
             </div>
           </div>
