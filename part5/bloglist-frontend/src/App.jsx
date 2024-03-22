@@ -10,10 +10,18 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   const [message, setMessage] = useState('')
+  const sortedBlogs = blogs => {
+    var items = Object.keys(blogs).map(key => {
+      return blogs[key]
+    })
+    
+    items.sort((first, second) => { return first['likes'] - second['likes']})
+    return items
+  }
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs( sortedBlogs(blogs) )
     )  
   }, [])
 
