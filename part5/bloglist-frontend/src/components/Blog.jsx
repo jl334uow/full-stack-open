@@ -9,6 +9,11 @@ const Blog = ({ blog }) => {
     await blogService.update(blog.id, {likes: blog.likes + 1})
       .then(window.location.reload())
   }
+  const handleRemoveBlog = async (blog) => {
+    if (window.confirm('Remove ' + blog.title + ' by ' + blog.author)) {
+      await blogService.remove(blog.id).then(window.location.reload())
+    }
+  }
   return (
   <div>
     <div style={ hideWhenVisible }>
@@ -19,6 +24,7 @@ const Blog = ({ blog }) => {
       <p>{blog.url}</p>
       <p>likes {blog.likes} <button onClick = {() => {increaseBlogLikes(blog)}}>like</button></p>
       <p>{blog.author}</p>
+      <button onClick={() => {handleRemoveBlog(blog)}}>remove</button>
     </div>
   </div>
   )
