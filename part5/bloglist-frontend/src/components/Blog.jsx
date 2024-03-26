@@ -16,10 +16,10 @@ const Blog = ({ blog }) => {
   }
   return (
   <div>
-    <div style={ hideWhenVisible }>
+    <div className='blog' style={ hideWhenVisible }>
       {blog.title} {blog.author} <button onClick = {() =>{setBlogVisible(true)}}>view</button>
     </div>
-    <div style={ showWhenVisible }>
+    <div className='toggleableContent' style={ showWhenVisible }>
       <p>{blog.title} <button onClick = {() => {setBlogVisible(false)}}>hide</button></p>
       <p>{blog.url}</p>
       <p>likes {blog.likes} <button onClick = {() => {increaseBlogLikes(blog)}}>like</button></p>
